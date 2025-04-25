@@ -16,10 +16,18 @@ DataModel = setmetatable({}, {
 		end
 	end
 })
+
 for _, v in pairs(game:GetChildren()) do
 	DataModel[v.Name] = setmetatable({}, {
 		__index = function(table, key)
-			return v[key]
+			local value = v[key]
+			if type(value) == "function" then
+				return function(...)
+					return value(v, ...)
+				end
+			else
+				return value
+			end
 		end,
 		__newindex = function(table, key, value)
 			if services[key] then
@@ -30,6 +38,7 @@ for _, v in pairs(game:GetChildren()) do
 		end
 	})
 end
+
 function DataModel:GetService(name: string)
 	return DataModel[name]
 end
